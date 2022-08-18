@@ -1,26 +1,59 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import './App.css'
+import {Die, dieType} from "./Die";
+import {nanoid} from "nanoid"
 
 function App() {
+  const [dice, setDice] = React.useState(allNewDice())
+
+  function generateNewDie(): dieType {
+    const id = nanoid()
+    return {
+      value: Math.ceil(Math.random() * 6).toString(),
+      isHeld: false,
+      id: id,
+      holdDice: () => holdDice(id)
+    }
+  }
+
+  function allNewDice() {
+    const newDice: dieType[] = []
+    for (let i = 0; i < 10; i++) {
+      newDice.push(generateNewDie())
+    }
+
+    return newDice
+  }
+
+
+  function rollDice() {
+    setDice(oldDice => oldDice.map(die => {
+      return die.isHeld ? die : generateNewDie()
+    }))
+  }
+
+  function holdDice(id: string) {
+    setDice(oldDice => oldDice.map(die => {
+      return die.id === id ?
+        {...die, isHeld: !die.isHeld} :
+        die
+    }))
+  }
+
+  const diceElements = dice.map(die => <Die key={die.id} value={die.value} isHeld={die.isHeld} id={die.id}
+                                            holdDice={() => holdDice(die.id)}/>)
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <main>
+      <h1 className="title">Tenzies</h1>
+      <p className="instructions">Roll until all dice are the same. Click each die to freeze it at its current value
+        between rolls.</p>
+      <div className={"dice-container"}>
+        {diceElements}
+      </div>
+      <button className={"roll-dice"} onClick={rollDice}>Roll</button>
+    </main>
+  )
 }
 
 export default App;
