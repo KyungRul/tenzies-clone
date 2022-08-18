@@ -39,9 +39,14 @@ function App() {
 
 
   function rollDice() {
-    setDice(oldDice => oldDice.map(die => {
-      return die.isHeld ? die : generateNewDie()
-    }))
+    if (!tenzies) {
+      setDice(oldDice => oldDice.map(die => {
+        return die.isHeld ? die : generateNewDie()
+      }))
+    } else {
+      setTenzies(false)
+      setDice(allNewDice())
+    }
   }
 
   function holdDice(id: string) {
@@ -64,7 +69,9 @@ function App() {
       <div className={"dice-container"}>
         {diceElements}
       </div>
-      <button className={"roll-dice"} onClick={rollDice}>{tenzies ? "New Game" : "Roll"}</button>
+      <button className={"roll-dice"} onClick={rollDice}>
+        {tenzies ? "New Game" : "Roll"}
+      </button>
     </main>
   )
 }
